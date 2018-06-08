@@ -1,0 +1,224 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper, hmargin={2.8cm, 2.8cm}, vmargin={2.5cm, 2.5cm}]{geometry}
+\usepackage{eso-pic} % \AddToShipoutPicture
+\usepackage{graphicx} % \includegraphics
+\usepackage{listings}
+
+
+
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage[pdftex]{color,graphicx}
+% \usepackage{wrapfig}
+% \usepackage{caption}
+% \usepackage{subcaption}
+% \usepackage{float}
+% \usepackage{mdwlist}
+% \usepackage{pgfgantt}
+% \usepackage[showframe=false]{geometry}
+% \usepackage{changepage}
+% \usepackage[bookmarks]{hyperref}
+% \usepackage{listings}
+% \usepackage{dirtree}
+% \usepackage{todonotes}
+
+%% Change `ku-farve` to `nat-farve` to use SCIENCE's old colors or
+%% `natbio-farve` to use SCIENCE's new colors and logo.
+\def \ColourPDF {include/ku-farve}
+
+%% Change `ku-en` to `nat-en` to use the `Faculty of Science` header
+\def \TitlePDF   {include/ku-en}  % University of Copenhagen
+
+\title{
+  \vspace{3cm}
+  \Huge{AP Assignment 2 - SubScript Parser} \\
+  \Large{DIKU University of Copenhagen 2017}
+}
+
+\author{
+  \Large{Jan Sokol, Denis Trebula}
+  \\ \texttt{\{kgj360,jmp640\}@alumni.ku.dk} \\
+}
+
+\date{
+    \today
+}
+
+\begin{document}
+
+
+\AddToShipoutPicture*{\put(0,0){\includegraphics*[viewport=0 0 700 600]{\ColourPDF}}}
+\AddToShipoutPicture*{\put(0,602){\includegraphics*[viewport=0 600 700 1600]{\ColourPDF}}}
+
+\AddToShipoutPicture*{\put(0,0){\includegraphics*{\TitlePDF}}}
+
+\clearpage\maketitle
+\thispagestyle{empty}
+
+\newpage
+
+
+
+%% Write your dissertation here.
+
+\section{Subscript Parser} \\
+
+
+\section{Choice of parser combinatory library} \\
+
+At first we had to choose a solid library for working with parsing and grammar in our project. Two main
+libraries which got our attention were Parsec and ReadP. After further decision making we chose to use
+the Parsec combinatory library because according to the documentation it performs best on predictive
+(LL) grammars. In addition, it contains extensive error messages which make the development of the
+code easier. Finally, we can combine small parsing functions to build more complex parsers.
+\section{Usage of biased combinators} \\
+
+When we need to parse a text for example basic true or false text, we try applying it to a parser
+function. If we didn’t use the try combinator, we could lose the already parsed text and none of the
+other parsers would have given a correct result.
+ With the try combinator, we have the ability to backtrack and pass the same text to another
+parser. This is needed when we parse the SubScript language because many of its grammar productions
+have many alternatives. If a parser fails for an one alternative, then we have the ability to try the same
+text for the next alternative.
+\section{Grammar} \\
+
+To have grammar that is working with Parsec library, we have to remove left recursion. If a context-free grammar
+has a $A  \rightarrow A\alpha$ rule, then is left-recursive. In grammar given in assesement, we can see this in first rule for example:
+\begin{verbatim}
+Expr ::= Expr ‘,’ Expr | Expr1
+\end{verbatim}
+
+To remove left recursion from grammar, we need to replace left-recursive rules.[1][2] Rule $A  \rightarrow A\alpha|\beta$ can be rewritten as:
+\\
+$A \rightarrow \beta A'$ \\
+$A' \rightarrow aA'$
+
+Also as stated in the assesement, some operators precedence the others. For example \texttt{*, \%} have higher precedence than \texttt{+, -}, so we split \texttt{Expr1} rule into multiple rules.
+
+Using this we transformed grammar from assessement to:
+\begin{verbatim}
+  Expr        ::= Expr1 Expr'
+
+  Expr'       ::= ',' Expr | eps
+
+  Expr1       ::= Ident '=' Expr1
+              | Expr2
+
+  Expr2       ::= Expr3 Expr2'
+
+  Expr2'      ::= '===' Expr3 Expr2'
+              | '<' Expr3 Expr2'
+              | eps
+
+  Expr3       ::= Expr4 Expr3'
+
+  Expr3'    ::= '+' Expr4 Expr3'
+              | '-' Expr4 Expr3'
+              | eps
+
+  Expr4       ::= ExprTerm Expr4'
+
+  Expr4'    ::= '*' ExprTerm Expr4'
+              | '%' ExprTerm Expr4'
+              | eps
+
+  ExprTerm  ::= Number
+              | String
+            	| 'true'
+            	| 'false'
+            	| 'undefined'
+            	| Ident ExprIdent
+            	| '[' Exprs ']'
+            	| '[' 'for' '(' Ident 'of' Expr1 ')' ArrayCompr Expr1 ']'
+
+  ExprIdent ::= '(' Exprs ')'
+              | eps
+
+  Exprs       ::= Expr1 CommaExprs
+              | eps
+
+  CommaExprs  ::= ',' Expr1 CommaExprs
+              | eps
+
+  ArrayFor    ::= 'for' '(' Ident 'of' Expr1 ')' ArrayCompr
+
+  ArrayIf     ::= 'if' '(' Expr1 ')'
+
+  ArrayCompr  ::= Expr1
+              | ArrayFor
+              | ArrayIf
+
+  Ident       ::= (as in assignment)
+  Number      ::=
+  String      ::=
+\end{verbatim}
+
+\section{Whitespace handling} \\
+
+For optimization purposes we handle whitespaces using three functions. To remove any unnecesary whitespaces around string
+ token we use function \texttt{sToken} that takes string as a parameter. (Function uses \texttt{spaces} parser from Parsec library and removes any amount of whitespaces, that would make parser fail otherwise.)
+\begin{verbatim}
+  sToken :: String -> Parser String
+  sToken s = try (spaces >> string s <* spaces)
+\end{verbatim}
+Second function \texttt{whitespaceParser} is more robust, also calls funtion \texttt{commentHandler} if necesary. Is used mainly in function
+\texttt{backslashCheck} that parses strings. For easier measures we also used function whitespaceHandler which can be found in slides from second lecture on parser.
+\begin{verbatim}
+
+whitespaceParser :: Parser ()
+whitespaceParser = do
+                    first <- many $ oneOf " \n\t"
+                    second <- many commentHandler
+                    when (not (null first) || not (null second)) $
+                      do whitespaceParser -- recursive call
+                         return ()
+\end{verbatim}
+
+
+
+
+
+\section{Parser implementation and Assesment} \\
+
+For implementation we used skeleton from the assesment zip file. We changed type of ParserError from one defined in assesment to one in \texttt{Text.Parsec.Error} library. 
+
+Based on our tests and OnlineTA we can say that our parser is able to succesfully parse SubScript files given in the assesment directory. 
+Parser only has problems with comments, if they are inside string (such as name of a variable).
+
+ Precedence of operators is correctly implemented (acording to our tests and tests from OnlineTA), also operators have left association
+ (we have included tests for this). If a number has more than 8 digits (or 7 with negative sign), parser won't accept it.
+
+\section{How to run code and reproduce test results} \\
+
+We have managed to implement a bit of unit testing in the \texttt{Parser/Tests.hs}. We used tasty framework
+which was widely recommended by the Haskell community. Take in mind that in order to properly compile
+and run tests, you must have downloaded and installed tasty framework and its plugin,
+\texttt{tasty-HUnit}. In order to do so type this in command line:
+\begin{verbatim}
+
+ stack install tasty
+ stack install tasty-hunit
+ \end{verbatim}
+
+To run the code with our unit tests:
+\begin{verbatim}
+
+ stack exec ghci -- -W Parser/Tests.hs
+ \end{verbatim}
+
+And run the main function as:
+\begin{verbatim}
+
+ main
+ \end{verbatim}
+
+This function will perform all the tests in the Tests.hs module. The tests evaluate a given input to a
+parser if it is the same as the expected output. If the result matches the expected value, then the tests
+are successful.
+
+\subsection{Resources}
+\texttt{[1]} \href{http://www.csd.uwo.ca/~moreno//CS447/Lectures/Syntax.html/node8.html}
+\\
+\texttt{[2]} \href{http://web.eecs.umich.edu/~weimerw/2009-4610/reading/left-recursion.pdf}
+\end{document}
