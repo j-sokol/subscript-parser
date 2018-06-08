@@ -1,0 +1,47 @@
+\contentsline {section}{\numberline {1}Subscript, Parser}{1}
+\contentsline {subsection}{\numberline {1.1}Parser library}{1}
+\contentsline {subsection}{\numberline {1.2}Updated grammar}{1}
+\contentsline {subsection}{\numberline {1.3}Testing}{2}
+\contentsline {subsection}{\numberline {1.4}Assessment}{3}
+\contentsline {section}{\numberline {2}Subscript, Interpreter}{3}
+\contentsline {subsection}{\numberline {2.1}Implementation}{3}
+\contentsline {paragraph}{\texttt {evalExpr}}{3}
+\contentsline {paragraph}{\texttt {stm} }{4}
+\contentsline {paragraph}{\texttt {runProg}}{4}
+\contentsline {subsection}{\numberline {2.2}List comprehension}{4}
+\contentsline {subsubsection}{\numberline {2.2.1}Simplifications}{4}
+\contentsline {subsection}{\numberline {2.3}Testing}{4}
+\contentsline {subsection}{\numberline {2.4}Assessment}{5}
+\contentsline {section}{\numberline {3}Generic Replicated Server Library}{5}
+\contentsline {subsection}{\numberline {3.1}Structure}{5}
+\contentsline {paragraph}{Coordinator}{5}
+\contentsline {paragraph}{replica}{5}
+\contentsline {paragraph}{Callback module}{6}
+\contentsline {subsubsection}{\numberline {3.1.1}Simplifications}{6}
+\contentsline {subsection}{\numberline {3.2}Testing}{6}
+\contentsline {subsection}{\numberline {3.3}Assessment}{7}
+\contentsline {section}{\numberline {4}AlzheimerDB}{7}
+\contentsline {subsection}{\numberline {4.1}Error handling}{7}
+\contentsline {subsection}{\numberline {4.2}Querying efficiently}{7}
+\contentsline {subsection}{\numberline {4.3}Testing}{7}
+\contentsline {paragraph}{Testing Program:}{7}
+\contentsline {paragraph}{EUnit tests:}{8}
+\contentsline {subsection}{\numberline {4.4}Assessment}{8}
+\contentsline {section}{\numberline {A}Source code}{9}
+\contentsline {subsubsection}{\numberline {A.0.1}Parser}{9}
+\contentsline {subsection}{\numberline {A.1}Interpreter}{9}
+\contentsline {subsection}{\numberline {A.2}Generic replicated server}{9}
+\contentsline {subsubsection}{\numberline {A.2.1}\texttt {gen\_replicated.erl}}{9}
+\contentsline {subsubsection}{\numberline {A.2.2}\texttt {replica.erl}}{9}
+\contentsline {subsection}{\numberline {A.3}AlzheimerDB}{9}
+\contentsline {subsubsection}{\numberline {A.3.1}\texttt {alzheimer.erl}}{9}
+\contentsline {subsubsection}{\numberline {A.3.2}\texttt {dbtest.erl}}{9}
+\contentsline {section}{\numberline {B}Test files}{9}
+\contentsline {subsection}{\numberline {B.1}Parser tests}{9}
+\contentsline {subsubsection}{\numberline {B.1.1}\texttt {ParserTest.hs}}{9}
+\contentsline {subsection}{\numberline {B.2}Interpreter tests}{9}
+\contentsline {subsubsection}{\numberline {B.2.1}\texttt {InterpreterTest.hs}}{9}
+\contentsline {subsection}{\numberline {B.3}Generic replicated server tests}{9}
+\contentsline {subsubsection}{\numberline {B.3.1}\texttt {genTests.erl}}{9}
+\contentsline {subsection}{\numberline {B.4}AlzheimerDB tests}{9}
+\contentsline {subsubsection}{\numberline {B.4.1}\texttt {alzTests.erl}}{9}
