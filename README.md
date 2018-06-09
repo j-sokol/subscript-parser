@@ -1,4 +1,4 @@
-# TypeScript Parser
+# SubScript Parser
 
 
 Short example of how to write a parser of JavaScript subset in Haskell. 
